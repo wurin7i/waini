@@ -63,7 +63,7 @@ sudo apt update && sudo apt install make -y
 Once `make` is installed, you can deploy the services by running:
 
 ```bash
-make up
+make init <WA number>
 ```
 
 This command will deploy the Kong API Gateway (including the Kong Manager admin panel) and a WhatsApp API service.
@@ -73,31 +73,31 @@ Open `http://<your-public-ip>:8002` in your favorite browser to manage gateway s
 
 ## Available Commands
 
-1) Spin-Up Services
+1) Spin-Up Kong and registered WA services
 
     ```bash
     make up
     ```
 
-2) Add another service
+2) Add another WA service
 
     ```bash
     make deploy 6289xxxxxxxx
     ```
 
-3) Drop service
+3) Drop WA service
 
     ```bash
     make drop 6289xxxxxxxx
     ```
 
-4) List registered services
+4) List registered WA services
 
     ```bash
     make list
     ```
 
-5) Manage service
+5) Manage WA service
 
     ```bash
     make service start|stop|remove 6289xxxxxxxx
@@ -105,9 +105,9 @@ Open `http://<your-public-ip>:8002` in your favorite browser to manage gateway s
 
 ## Todo
 
-[ ] Secure Kong Manager endpoint
-[ ] Command set for manage WA API routing rules
-[ ] ...
+- [ ] Secure Kong Manager endpoint
+- [ ] Command set for manage WA API routing rules
+- [ ] ...
 
 
 ## References

@@ -1,10 +1,15 @@
 STACK_NAME=waini
-MANIFEST_DIR=wa-service
+MANIFEST_DIR=wa-services
 TEMPLATE_FILE=$(MANIFEST_DIR)/_template
+
+init:
+	@${MAKE} generate $(word 2, $(MAKECMDGOALS))
+	@${MAKE} up
 
 up:
 	docker stack deploy --detach=true \
-		-c docker-compose.yaml $(shell find $(MANIFEST_DIR) -name '*.yaml' -exec printf " -c {}" \;) \
+		-c network.yaml -c kong.yaml \
+		$(shell find $(MANIFEST_DIR) -type f -name '*.yaml' -exec printf " -c {}" \;) \
 		${STACK_NAME}
 	@echo "✅ Stack started"
 
@@ -28,7 +33,7 @@ remove:
 deploy:
 	@${MAKE} generate $(word 2, $(MAKECMDGOALS))
 	@echo "Starting stack with additional services..."
-	@$(MAKE) up
+	@$(MAKE) service start $(word 2, $(MAKECMDGOALS))
 
 drop:
 	@${MAKE} remove $(word 2, $(MAKECMDGOALS))

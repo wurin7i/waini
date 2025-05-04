@@ -16,36 +16,60 @@ volumes:
     driver_opts:
       type: tmpfs
       device: tmpfs
-  whatsapp_storage:
-
-networks:
-  kong-net:
-    external: false
 
 services:
+  db:
+    image: postgres:9.5
+    environment:
+      POSTGRES_DB: ${KONG_PG_DATABASE:-kong}
+      POSTGRES_USER: ${KONG_PG_USER:-kong}
+      POSTGRES_PASSWORD_FILE: /run/secrets/kong_postgres_password
+    secrets:
+      - kong_postgres_password
+    networks:
+      - waini-net
+    volumes:
+      - kong_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${KONG_PG_DATABASE:-kong}", "-U", "${KONG_PG_USER:-kong}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      restart_policy:
+        condition: on-failure
+
   kong-migrations:
     image: "${KONG_DOCKER_TAG:-kong:latest}"
     command: kong migrations bootstrap
-    depends_on:
-      - db
     environment:
       <<: *kong-env
     secrets:
       - kong_postgres_password
     networks:
-      - kong-net
+      - waini-net
+    deploy:
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - node.role == manager
 
   kong-migrations-up:
     image: "${KONG_DOCKER_TAG:-kong:latest}"
-    command: kong migrations up && kong migrations finish
-    depends_on:
-      - db
+    command: /bin/sh -c "kong migrations up && kong migrations finish"
     environment:
       <<: *kong-env
     secrets:
       - kong_postgres_password
     networks:
-      - kong-net
+      - waini-net
+    deploy:
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - node.role == manager
 
   kong:
     image: "${KONG_DOCKER_TAG:-kong:latest}"
@@ -64,7 +88,7 @@ services:
     secrets:
       - kong_postgres_password
     networks:
-      - kong-net
+      - waini-net
     ports:
       # The following two environment variables default to an insecure value (0.0.0.0)
       # according to the CIS Security test.
@@ -87,46 +111,10 @@ services:
       - kong_prefix_vol:${KONG_PREFIX:-/var/run/kong}
       - kong_tmp_vol:/tmp
       - ./config:/opt/kong
-
-  db:
-    image: postgres:9.5
-    environment:
-      POSTGRES_DB: ${KONG_PG_DATABASE:-kong}
-      POSTGRES_USER: ${KONG_PG_USER:-kong}
-      POSTGRES_PASSWORD_FILE: /run/secrets/kong_postgres_password
-    secrets:
-      - kong_postgres_password
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "pg_isready",
-          "-d",
-          "${KONG_PG_DATABASE:-kong}",
-          "-U",
-          "${KONG_PG_USER:-kong}"
-        ]
-      interval: 30s
-      timeout: 30s
-      retries: 3
-    stdin_open: true
-    tty: true
-    networks:
-      - kong-net
-    volumes:
-      - kong_data:/var/lib/postgresql/data
-
-  whatsapp:
-    image: aldinokemal2104/go-whatsapp-web-multidevice
-    volumes:
-      - whatsapp_storage:/app/storages
-    environment:
-      - APP_OS=WAini
-      - APP_PORT=3000
-      - APP_ACCOUNT_VALIDATION=false
-    networks:
-      - kong-net
+    deploy:
+      restart_policy:
+        condition: on-failure
 
 secrets:
   kong_postgres_password:
-    file: ./POSTGRES_PASSWORD
+    file: ./secrets/POSTGRES_PASSWORD

@@ -27,15 +27,20 @@ if [ ! -f "$TARGET_FILE" ]; then
     exit 1
 fi
 
-if ! service_exists; then
-    echo "❌ Service for ${NUMBER} not found in stack. Ensure the service is deployed."
-    exit 1
+if ! service_exists && [[ "$ACTION" != "start" ]]; then
+  echo "❌ Service for ${NUMBER} not found in stack. Ensure the service is deployed."
+  exit 1
 fi
 
 case "$ACTION" in
   start)
-    echo "🚀 Starting service for $NUMBER..."
-    docker service scale "$SERVICE_NAME"=1
+    if service_exists; then
+      echo "🔄 Starting service for $NUMBER..."
+      docker service scale "$SERVICE_NAME"=1
+    else
+      echo "🚀 Deploying service for $NUMBER..."
+      docker stack deploy --detach=false -c "$TARGET_FILE" -c "network.yaml" "$STACK_NAME"
+    fi
     ;;
 
   stop)

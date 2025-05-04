@@ -11,4 +11,7 @@ services:
       - APP_PORT=3000
       - APP_ACCOUNT_VALIDATION=false
     networks:
-      - kong-net
+      - waini-net
+    deploy:
+      restart_policy:
+        condition: any
