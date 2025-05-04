@@ -13,9 +13,9 @@ This project integrates the WA API with Kong Gateway to provide a reliable and e
 
 ## Prerequisites
 
-- Docker (swarm mode) and Docker Compose installed on your system.
-- `make` installed on your system.
 - Basic understanding of API Gateway concepts and Docker.
+- Docker (swarm mode) and Docker Compose and `make` installed on your system.
+  If these are not prepared yet, refer to the [System Preparation](#system-preparation) section for guidance.
 
 
 ## Getting Started
@@ -28,45 +28,23 @@ git clone https://github.com/wurin7i/waini.git
 cd waini
 ```
 
-### Check Swarm Mode Enabled
+### System Preparation
 
-Before proceeding with the deployment, ensure that Docker Swarm mode is enabled on your system. Swarm mode is required for managing services and scaling containers effectively.
+Before proceeding with the deployment, ensure that Docker Swarm mode is enabled on your system. Swarm mode is required for managing services and scaling containers effectively. Run the following command to prepare system:
 
-1. **Verify Swarm Mode**:
-    Run the following command to check if Swarm mode is active:
-    ```bash
-    docker info | grep "Swarm"
-    ```
-    If Swarm mode is enabled, you should see output similar to:
-    ```
-    Swarm: active
-    ```
-
-2. **Enable Swarm Mode**:
-    If Swarm mode is not active, you can enable it by running:
-    ```bash
-    docker swarm init
-    ```
-    This command initializes a new Swarm and sets up your system as the manager node.
-
-3. **Confirm Swarm Initialization**:
-    After enabling Swarm mode, verify it again using the `docker info` command to ensure it is active.
+```bash
+make prepare
+```
 
 ## Deploy WA API Gateway
 
-Ensure `make` is installed on your system. If it is not already installed, you can install it using the following command:
-
-```bash
-sudo apt update && sudo apt install make -y
-```
-
-Once `make` is installed, you can deploy the services by running:
+You can deploy the services by running the following command:
 
 ```bash
 make init <WA number>
 ```
 
-This command will deploy the Kong API Gateway (including the Kong Manager admin panel) and a WhatsApp API service.
+It will deploy the Kong API Gateway including the Kong Manager (admin panel) and a WhatsApp API service.
 
 Open `http://<your-public-ip>:8002` in your favorite browser to manage gateway services, define routing rules, secure endpoints, throttle requests, and more.
 

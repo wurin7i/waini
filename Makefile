@@ -2,6 +2,9 @@ STACK_NAME=waini
 MANIFEST_DIR=wa-services
 TEMPLATE_FILE=$(MANIFEST_DIR)/_template
 
+prepare:
+	scripts/prepare_system.sh
+
 init:
 	@${MAKE} generate $(word 2, $(MAKECMDGOALS))
 	@${MAKE} up
