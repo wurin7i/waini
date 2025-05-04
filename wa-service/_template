@@ -1,0 +1,14 @@
+volumes:
+  wa{{account_number}}_storage:
+
+services:
+  wa{{account_number}}:
+    image: aldinokemal2104/go-whatsapp-web-multidevice
+    volumes:
+      - wa{{account_number}}_storage:/app/storages
+    environment:
+      - APP_OS=WAini
+      - APP_PORT=3000
+      - APP_ACCOUNT_VALIDATION=false
+    networks:
+      - kong-net
