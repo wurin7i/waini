@@ -3,7 +3,7 @@ services:
     image: cloudflare/cloudflared:latest
     command: tunnel run
     environment:
-      TUNNEL_TOKEN: /run/secrets/cloudflare_tunnel_token
+      TUNNEL_TOKEN_FILE: /run/secrets/cloudflare_tunnel_token
     secrets:
       - cloudflare_tunnel_token
     networks:
@@ -11,6 +11,9 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
 
 secrets:
   cloudflare_tunnel_token:

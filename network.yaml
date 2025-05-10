@@ -1,3 +1,4 @@
 networks:
   waini-net:
     external: false
+    attachable: true

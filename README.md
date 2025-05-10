@@ -42,6 +42,12 @@ cd waini
 
 ## Deploy WA API Gateway
 
+### Set Secret
+
+Edit files under secrets folder.
+
+### Initialize Platform Stacks
+
 You can deploy the services by running the following command:
 
 ```bash

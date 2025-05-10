@@ -7,12 +7,20 @@ prepare:
 
 init:
 	@${MAKE} generate $(word 2, $(MAKECMDGOALS))
+	@if [ ! -f ./env/kong.env ]; then cp ./env/kong.env.example ./env/kong.env; fi
+	@if [ ! -f ./env/wa.env ]; then cp ./env/wa.env.example ./env/wa.env; fi
 	@${MAKE} up
+
+tunnel:
+	docker stack deploy --detach=true \
+		-c network.yaml -c cloudflared.yaml \
+		${STACK_NAME}
+	@echo "✅ Tunnel started"
 
 up:
 	docker stack deploy --detach=true \
 		-c network.yaml -c kong.yaml \
-		$(shell find $(MANIFEST_DIR) -type f -name '*.yaml' -exec printf " -c {}" \;) \
+		$(shell find $(MANIFEST_DIR) -type f -name '*.yaml' -exec printf "-c {}" \;) \
 		${STACK_NAME}
 	@echo "✅ Stack started"
 
@@ -35,7 +43,6 @@ remove:
 
 deploy:
 	@${MAKE} generate $(word 2, $(MAKECMDGOALS))
-	@echo "Starting stack with additional services..."
 	@$(MAKE) service start $(word 2, $(MAKECMDGOALS))
 
 drop:
