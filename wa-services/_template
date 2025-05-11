@@ -7,7 +7,7 @@ services:
     volumes:
       - wa{{account_number}}_storage:/app/storages
     env_file:
-      - ./env/wa.env
+      - ../env/wa.env
     networks:
       - waini-net
     deploy:
