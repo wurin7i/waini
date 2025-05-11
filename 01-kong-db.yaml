@@ -1,0 +1,22 @@
+volumes:
+  kong_data: {}
+
+services:
+  db:
+    image: postgres:9.5
+    environment:
+      POSTGRES_DB: ${KONG_PG_DATABASE:-kong}
+      POSTGRES_USER: ${KONG_PG_USER:-kong}
+      POSTGRES_PASSWORD:  ${KONG_PG_PASSWORD:-kong}
+    networks:
+      - waini-net
+    volumes:
+      - kong_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${KONG_PG_DATABASE:-kong}", "-U", "${KONG_PG_USER:-kong}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      restart_policy:
+        condition: on-failure
